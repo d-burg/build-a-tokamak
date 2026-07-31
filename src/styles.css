@@ -137,7 +137,7 @@ body {
 /* ---------- layout ---------- */
 .layout {
   display: grid;
-  grid-template-columns: 290px minmax(360px, 1fr) 360px;
+  grid-template-columns: 280px minmax(340px, 1fr) 385px;
   gap: 1rem;
   align-items: start;
 }
@@ -276,8 +276,8 @@ body {
 }
 /* fixed column widths: expanding numbers can't reflow the table */
 .out-group table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.out-group col.col-computed { width: 8.2rem; }
-.out-group col.col-book { width: 4.6rem; }
+.out-group col.col-computed { width: 7.6rem; }
+.out-group col.col-book { width: 3.9rem; }
 .out-group th {
   font-size: 0.66rem;
   font-weight: 500;
@@ -300,11 +300,11 @@ body {
 .book-col { color: var(--muted); font-weight: 400 !important; }
 .row-symbol {
   display: inline-block;
-  min-width: 2.6rem;
+  min-width: 2.2rem;
   font-style: italic;
   color: var(--muted);
 }
-.row-label { font-size: 0.78rem; }
+.row-label { font-size: 0.75rem; }
 .unit { color: var(--muted); font-weight: 400; font-size: 0.72rem; }
 .dev-ok { color: var(--text); }
 .dev-warn { color: var(--warn); }
@@ -441,3 +441,5 @@ body {
   line-height: 1.5;
   text-align: center;
 }
+.footer-link { color: var(--accent); font-weight: 600; text-decoration: none; }
+.footer-link:hover { text-decoration: underline; }

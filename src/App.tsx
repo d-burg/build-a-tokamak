@@ -8,6 +8,7 @@ import { OutputsPanel } from './components/OutputsPanel';
 import { NotesBar } from './components/NotesBar';
 import { PlotsPanel } from './components/PlotsPanel';
 import { WalkPanel } from './components/WalkPanel';
+import { buildReport, downloadText, reportFilename } from './export';
 
 const INITIAL: DesignInputs = { ...DEFAULTS, model: 'chapter' };
 type View = 'explore' | 'walk';
@@ -127,6 +128,19 @@ export function App() {
               {copied ? 'Copied!' : 'Share link'}
             </button>
           </span>
+          <button
+            className="btn"
+            title="Download a Markdown report of the current design"
+            onClick={() => {
+              const now = new Date();
+              downloadText(
+                reportFilename(now),
+                buildReport(result, window.location.href, now),
+              );
+            }}
+          >
+            Export
+          </button>
           <span className="status-slot">
             {atDefaults ? (
               <span className="badge badge-book">textbook design point</span>
@@ -158,6 +172,9 @@ export function App() {
         (1&nbsp;atm&nbsp;=&nbsp;10⁵&nbsp;Pa, E<sub>Li</sub>&nbsp;=&nbsp;4.8&nbsp;MeV).
         Small differences from the printed Table&nbsp;5.3 (≤&nbsp;7%, worst
         τ<sub>E</sub>) are the book&rsquo;s intermediate rounding, not model differences.
+        {' '}Script it yourself: <a className="footer-link" href="./build_a_tokamak.py"
+          download>build_a_tokamak.py</a> — the same verified design chain as a
+        single-file Python module (standard library only).
       </footer>
     </div>
   );

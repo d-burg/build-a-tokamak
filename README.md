@@ -104,6 +104,31 @@ itself) is fatal; bore closure R₀ − a − b ≤ 0, the inboard coil leg not 
 warnings. The cross-section deliberately draws the impossible machine so the collision is
 visible.
 
+## Scripting it yourself (students)
+
+Two ways to take the model beyond the sliders:
+
+- **Export button** (top right of the app): downloads a date-stamped Markdown report of
+  the current design — inputs, all outputs beside the Table 5.3 column, active warnings,
+  the share URL that reproduces the state, and a machine-readable JSON block. Suitable
+  for attaching to a problem set.
+- **`build_a_tokamak.py`** ([download](https://d-burg.github.io/build-a-tokamak/build_a_tokamak.py),
+  also in `public/` in this repo): the entire verified design chain as a single-file
+  Python module, standard library only. One function, one dataclass:
+
+  ```python
+  from build_a_tokamak import design_reactor, sigmav_dt
+
+  d = design_reactor()                        # Table 5.3 design point
+  d = design_reactor(Bmax=20, kappa=1.8)      # your machine
+  d = design_reactor(sigmav=sigmav_dt(12.0), T_keV=12.0)   # Bosch-Hale reactivity
+  print(d.R0, d.beta, d.warnings)             # d.as_dict() for the full record
+  ```
+
+  Running `python3 build_a_tokamak.py` prints the Table 5.3 comparison, a κ scan and a
+  reactivity check. The module is pinned to the same verified fixtures as the app's
+  TypeScript core (agreement to 1 part in 10⁹), so scripted results match the site.
+
 ## Deployment
 
 Static build, published to GitHub Pages by a GitHub Actions workflow: on push to `main`,
