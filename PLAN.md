@@ -158,10 +158,16 @@ color, dark-mode aware). Every displayed quantity hover-reveals its governing eq
    duality makes κ=1 the cost optimum (a cusp — never spline through it); the model shows
    only geometric effects of elongation, and the in-app info note says so (the real β-limit
    motivation for κ>1 is deliberately absent from the chapter).
-3. **M2 — Plots**: cost curve, blanket attenuation, B(R), T²/⟨σv⟩ + ignition.
-4. **M3 — Design Walk mode** + equation popovers + comparison card.
-5. **M4 — Polish & deploy**: presets, URL state, dark mode, GitHub Pages CI, instructor
-   README + 1-page student handout.
+3. **M2 — Plots** ✅ done 2026-07-31: four tabs (cost optimum V_I/P_E(a), blanket
+   attenuation E(x)/Γ(x), 1/R field profile, Bosch–Hale ignition pτ_E(T) with the
+   operating point and both minima annotated). Hand-rolled SVG plots, no chart deps.
+4. **M3 — Design Walk mode** ✅ done 2026-07-31: 7-step guided walk (premise → blanket →
+   coil+cost → R₀ → burn → demands → fission/fossil perspective card), KaTeX equations.
+5. **M4 — Polish & deploy** ✅ done 2026-07-31: 6 preset scenarios, URL-shareable state,
+   README + docs/STUDENT_HANDOUT.md + docs/INSTRUCTOR_NOTES.md (Opus-agent written),
+   MIT license, GitHub Actions CI (test + build + deploy).
+   **Live at https://d-burg.github.io/build-a-tokamak/** (repo d-burg/build-a-tokamak;
+   project renamed from fusion-reactor-designer to build-a-tokamak).
 
 ## 8. Verification results (from Opus 5 agents)
 

@@ -122,16 +122,20 @@ export function App() {
               </option>
             ))}
           </select>
-          <button className="btn" onClick={share}>
-            {copied ? 'Copied!' : 'Share link'}
-          </button>
-          {atDefaults ? (
-            <span className="badge badge-book">textbook design point</span>
-          ) : (
-            <button className="btn" onClick={() => setInputs(INITIAL)}>
-              Reset
+          <span className="share-slot">
+            <button className="btn" onClick={share}>
+              {copied ? 'Copied!' : 'Share link'}
             </button>
-          )}
+          </span>
+          <span className="status-slot">
+            {atDefaults ? (
+              <span className="badge badge-book">textbook design point</span>
+            ) : (
+              <button className="btn" onClick={() => setInputs(INITIAL)}>
+                Reset to textbook
+              </button>
+            )}
+          </span>
         </div>
       </header>
 

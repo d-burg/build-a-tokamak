@@ -58,6 +58,11 @@ export function OutputsPanel({ result }: { result: DesignResult }) {
         <div key={g.title} className="out-group">
           <h3>{g.title}</h3>
           <table>
+            <colgroup>
+              <col />
+              <col className="col-computed" />
+              <col className="col-book" />
+            </colgroup>
             <thead>
               <tr>
                 <th />

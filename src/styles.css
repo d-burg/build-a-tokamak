@@ -94,16 +94,28 @@ body {
 }
 .btn:hover { filter: brightness(0.96); }
 
-/* ---------- notes ---------- */
-.notes { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.9rem; }
+/* ---------- notes: fixed-height strip so the page never reflows ---------- */
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.9rem;
+  height: 5rem;
+  overflow-y: auto;
+}
 .note {
   display: flex;
   gap: 0.55rem;
   align-items: baseline;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   border-radius: 10px;
-  padding: 0.55rem 0.8rem;
+  padding: 0.45rem 0.75rem;
   line-height: 1.35;
+  flex-shrink: 0;
+}
+.note-ok {
+  background: color-mix(in srgb, var(--ok) 8%, transparent);
+  color: var(--ok);
 }
 .note-warning {
   background: color-mix(in srgb, var(--warn) 12%, transparent);
@@ -195,7 +207,13 @@ body {
 }
 .slider-label { color: var(--text); line-height: 1.3; }
 .sym { color: var(--muted); font-style: italic; }
-.slider-value { font-variant-numeric: tabular-nums; font-weight: 650; white-space: nowrap; }
+.slider-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  white-space: nowrap;
+  min-width: 5rem;
+  text-align: right;
+}
 .slider-value.default { color: var(--ok); }
 .slider.locked input { opacity: 0.45; }
 .lock-hint { font-size: 0.7rem; color: var(--muted); margin-top: 0.15rem; }
@@ -217,7 +235,8 @@ body {
 }
 
 /* ---------- cross-section ---------- */
-.cross-svg { width: 100%; height: auto; display: block; }
+/* fixed frame: the drawing rescales inside a static box (no panel jumping) */
+.cross-svg { width: 100%; aspect-ratio: 3 / 2; display: block; }
 .cross-error {
   padding: 2.5rem 1rem;
   text-align: center;
@@ -255,7 +274,10 @@ body {
   letter-spacing: 0.07em;
   color: var(--muted);
 }
-.out-group table { width: 100%; border-collapse: collapse; }
+/* fixed column widths: expanding numbers can't reflow the table */
+.out-group table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.out-group col.col-computed { width: 8.2rem; }
+.out-group col.col-book { width: 4.6rem; }
 .out-group th {
   font-size: 0.66rem;
   font-weight: 500;
@@ -326,10 +348,14 @@ body {
   color: var(--muted);
   font-size: 0.78rem;
   line-height: 1.5;
+  min-height: 4.7rem; /* tab switches don't change panel height */
 }
 
 /* ---------- header controls ---------- */
 .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+/* fixed-width slots so button/badge text swaps don't shift the header */
+.share-slot { min-width: 5.6rem; display: flex; justify-content: center; }
+.status-slot { min-width: 11.5rem; display: flex; justify-content: flex-end; }
 .view-toggle { display: flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
 .seg-sm {
   font: inherit;
@@ -355,6 +381,12 @@ body {
 }
 
 /* ---------- design walk ---------- */
+.walk {
+  min-height: 34rem; /* steps of different length share one frame */
+  display: flex;
+  flex-direction: column;
+}
+.walk-nav { margin-top: auto; }
 .walk-eyebrow {
   font-size: 0.68rem;
   text-transform: uppercase;
