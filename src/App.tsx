@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { design } from './physics/design';
 import { DEFAULTS } from './physics/constants';
+import { clampInput } from './physics/ranges';
 import type { DesignInputs } from './physics/types';
 import { SliderPanel } from './components/SliderPanel';
 import { CrossSection } from './components/CrossSection';
@@ -9,6 +10,7 @@ import { NotesBar } from './components/NotesBar';
 import { PlotsPanel } from './components/PlotsPanel';
 import { WalkPanel } from './components/WalkPanel';
 import { buildReport, downloadText, reportFilename } from './export';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const INITIAL: DesignInputs = { ...DEFAULTS, model: 'chapter' };
 type View = 'explore' | 'walk';
@@ -37,8 +39,13 @@ function fromURL(): { inputs: DesignInputs; view: View } {
   const q = new URLSearchParams(window.location.search);
   const inputs: DesignInputs = { ...INITIAL };
   for (const k of NUM_KEYS) {
-    const v = Number(q.get(k));
-    if (Number.isFinite(v) && v > 0 && q.get(k) !== null) inputs[k] = v;
+    const raw = q.get(k);
+    if (raw === null) continue;
+    const v = Number(raw);
+    // Clamp to the slider range: a hand-edited or stale link must never inject
+    // a value the sliders could not produce (out-of-range inputs can drive the
+    // model to non-finite geometry).
+    if (Number.isFinite(v)) inputs[k] = clampInput(k, v);
   }
   if (q.get('model') === 'boschHale') inputs.model = 'boschHale';
   const view: View = q.get('view') === 'walk' ? 'walk' : 'explore';
@@ -63,6 +70,7 @@ export function App() {
   const setInputs = (next: DesignInputs) => setState({ inputs: next, view });
   const setView = (v: View) => setState({ inputs, view: v });
   const [copied, setCopied] = useState(false);
+  const [boundaryKey, setBoundaryKey] = useState(0);
 
   useEffect(() => toURL(inputs, view), [inputs, view]);
 
@@ -155,17 +163,19 @@ export function App() {
 
       <NotesBar notes={result.notes} />
 
-      <main className="layout">
-        <SliderPanel inputs={inputs} onChange={setInputs} />
-        <CrossSection result={result} />
-        {view === 'explore' ? (
-          <OutputsPanel result={result} />
-        ) : (
-          <WalkPanel result={result} />
-        )}
-      </main>
+      <ErrorBoundary key={boundaryKey} onReset={() => { setInputs(INITIAL); setBoundaryKey((k) => k + 1); }}>
+        <main className="layout">
+          <SliderPanel inputs={inputs} onChange={setInputs} />
+          <CrossSection result={result} />
+          {view === 'explore' ? (
+            <OutputsPanel result={result} />
+          ) : (
+            <WalkPanel result={result} />
+          )}
+        </main>
 
-      {view === 'explore' && <PlotsPanel result={result} />}
+        {view === 'explore' && <PlotsPanel result={result} />}
+      </ErrorBoundary>
 
       <footer className="footer">
         All quantities follow the chapter&rsquo;s symbolic equations

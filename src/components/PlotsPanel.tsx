@@ -21,15 +21,30 @@ interface HLine { y: number; label: string }
 interface Mark { x: number; y: number; label?: string }
 interface Band { x0: number; x1: number; label?: string }
 
+/** Evenly spaced samples across [lo, hi]. Fixed count — cannot loop forever
+ *  however pathological the bounds are (unlike accumulating `x += step`). */
+function linspace(lo: number, hi: number, count: number): number[] {
+  if (!Number.isFinite(lo) || !Number.isFinite(hi) || hi <= lo) return [];
+  const out = new Array<number>(count);
+  for (let i = 0; i < count; i++) out[i] = lo + ((hi - lo) * i) / (count - 1);
+  return out;
+}
+
 function niceTicks(lo: number, hi: number, n = 5): number[] {
+  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return [];
   const span = hi - lo;
   if (!(span > 0)) return [lo];
   const raw = span / n;
   const mag = 10 ** Math.floor(Math.log10(raw));
   const norm = raw / mag;
   const step = (norm < 1.5 ? 1 : norm < 3.5 ? 2 : norm < 7.5 ? 5 : 10) * mag;
+  // A non-finite or non-advancing step would loop forever — bail out instead.
+  if (!Number.isFinite(step) || step <= 0) return [lo, hi];
   const t: number[] = [];
-  for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9 * span; v += step) {
+  const start = Math.ceil(lo / step) * step;
+  for (let i = 0; i < 200; i++) {
+    const v = start + i * step;
+    if (!(v <= hi + 1e-9 * span)) break;
     t.push(Math.abs(v) < 1e-12 * span ? 0 : v);
   }
   return t;
@@ -153,12 +168,11 @@ function LinePlot({
 function CostTab({ result }: { result: DesignResult }) {
   const { out, inputs } = result;
   const { KVI } = coefficients();
-  if (!Number.isFinite(out.a)) return <PlotUnavailable />;
+  if (!Number.isFinite(out.a) || !Number.isFinite(out.VIoverPE)) return <PlotUnavailable />;
   const aMax = 3.2 * out.a;
-  const pts: Array<[number, number]> = [];
-  for (let a = 0.08 * out.a; a <= aMax; a += aMax / 300) {
-    pts.push([a, costOfA(a, inputs.b, out.xi, inputs.PW, KVI, inputs.kappa)]);
-  }
+  const pts: Array<[number, number]> = linspace(0.08 * out.a, aMax, 300).map(
+    (a) => [a, costOfA(a, inputs.b, out.xi, inputs.PW, KVI, inputs.kappa)] as [number, number],
+  );
   const yMax = 3 * out.VIoverPE;
   return (
     <>
@@ -185,13 +199,9 @@ function CostTab({ result }: { result: DesignResult }) {
 function BlanketTab({ result }: { result: DesignResult }) {
   const { out, inputs } = result;
   const xMax = Math.max(1.5, inputs.b * 1.15);
-  const ePts: Array<[number, number]> = [];
-  const fPts: Array<[number, number]> = [];
-  for (let x = 0; x <= xMax; x += xMax / 300) {
-    const { E_MeV, flux } = attenuationProfile(x);
-    ePts.push([x, E_MeV / 14.1]);
-    fPts.push([x, flux]);
-  }
+  const xs = linspace(0, xMax, 300);
+  const ePts: Array<[number, number]> = xs.map((x) => [x, attenuationProfile(x).E_MeV / 14.1]);
+  const fPts: Array<[number, number]> = xs.map((x) => [x, attenuationProfile(x).flux]);
   return (
     <>
       <LinePlot
@@ -223,12 +233,11 @@ function BlanketTab({ result }: { result: DesignResult }) {
 function FieldTab({ result }: { result: DesignResult }) {
   const { out, inputs } = result;
   const Ri = out.R0 - out.a - inputs.b;
-  if (Ri <= 0 || !Number.isFinite(Ri)) return <PlotUnavailable />;
+  if (!(Ri > 0) || !Number.isFinite(Ri) || !Number.isFinite(out.R0)) return <PlotUnavailable />;
   const Rmax = out.R0 + out.a + inputs.b;
-  const pts: Array<[number, number]> = [];
-  for (let R = Ri; R <= Rmax; R += (Rmax - Ri) / 300) {
-    pts.push([R, (inputs.Bmax * Ri) / R]);
-  }
+  const pts: Array<[number, number]> = linspace(Ri, Rmax, 300).map(
+    (R) => [R, (inputs.Bmax * Ri) / R] as [number, number],
+  );
   return (
     <>
       <LinePlot
@@ -255,10 +264,9 @@ function FieldTab({ result }: { result: DesignResult }) {
 
 function IgnitionTab({ result }: { result: DesignResult }) {
   const { out, inputs } = result;
-  const pts: Array<[number, number]> = [];
-  for (let T = 5; T <= 40; T += 0.1) {
-    pts.push([T, pTauEIgnition(T)]);
-  }
+  const pts: Array<[number, number]> = linspace(5, 40, 351).map(
+    (T) => [T, pTauEIgnition(T)] as [number, number],
+  );
   const Tused = inputs.model === 'chapter' ? CHAPTER.T : inputs.T;
   return (
     <>

@@ -1,25 +1,8 @@
 import { DEFAULTS } from '../physics/constants';
+import { RANGES, clampInput } from '../physics/ranges';
 import type { DesignInputs } from '../physics/types';
 
-interface SliderSpec {
-  key: keyof typeof DEFAULTS;
-  label: string;
-  symbol: string;
-  unit: string;
-  min: number;
-  max: number;
-  step: number;
-}
-
-const SLIDERS: SliderSpec[] = [
-  { key: 'PE', label: 'Electric power output', symbol: 'P_E', unit: 'MW', min: 300, max: 3000, step: 25 },
-  { key: 'PW', label: 'Max neutron wall loading', symbol: 'P_W', unit: 'MW/m²', min: 1, max: 8, step: 0.1 },
-  { key: 'Bmax', label: 'Max field at the coil', symbol: 'B_max', unit: 'T', min: 5, max: 25, step: 0.1 },
-  { key: 'sigmaMax', label: 'Max coil stress', symbol: 'σ_max', unit: 'MPa', min: 100, max: 800, step: 10 },
-  { key: 'b', label: 'Blanket + shield thickness', symbol: 'b', unit: 'm', min: 0.6, max: 2.0, step: 0.02 },
-  { key: 'T', label: 'Plasma temperature', symbol: 'T', unit: 'keV', min: 5, max: 30, step: 0.1 },
-  { key: 'kappa', label: 'Plasma elongation', symbol: 'κ', unit: '', min: 0.5, max: 2.5, step: 0.05 },
-];
+const SLIDERS = RANGES;
 
 const SYMBOL_HTML: Record<string, JSX.Element> = {
   P_E: <>P<sub>E</sub></>,
@@ -88,7 +71,7 @@ export function SliderPanel({
                 value={value}
                 disabled={locked}
                 onChange={(e) =>
-                  onChange({ ...inputs, [s.key]: Number(e.target.value) })
+                  onChange({ ...inputs, [s.key]: clampInput(s.key, Number(e.target.value)) })
                 }
               />
               <span className="tick" style={{ left: `${tickPct}%` }} title="textbook value" />

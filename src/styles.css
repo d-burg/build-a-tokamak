@@ -441,5 +441,9 @@ body {
   line-height: 1.5;
   text-align: center;
 }
+.crash-card { text-align: center; padding: 2rem 1.5rem; }
+.crash-card h2 { font-size: 1.05rem; margin-bottom: 0.5rem; }
+.crash-card p { font-size: 0.85rem; color: var(--muted); max-width: 34rem; margin: 0 auto 0.7rem; line-height: 1.5; }
+.crash-detail { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.75rem !important; color: var(--bad) !important; }
 .footer-link { color: var(--accent); font-weight: 600; text-decoration: none; }
 .footer-link:hover { text-decoration: underline; }
